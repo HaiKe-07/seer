@@ -1,0 +1,77 @@
+<template>
+  <div>
+    <div class="page-title">设置</div>
+    <div class="page-sub">配置 DeepSeek AI、攻略可信度阈值与抓取来源。</div>
+
+    <div class="card section">
+      <div class="sec-title">DeepSeek AI 配置</div>
+      <div class="form">
+        <label>API Key
+          <input v-model="form.deepseekApiKey" type="password" placeholder="sk-…" />
+        </label>
+        <label>模型
+          <select v-model="form.model">
+            <option value="deepseek-chat">deepseek-chat</option>
+            <option value="deepseek-reasoner">deepseek-reasoner</option>
+          </select>
+        </label>
+        <label class="check">
+          <input v-model="form.aiEnabled" type="checkbox" style="width: auto" />
+          启用 AI 分析（攻略整理 / 阵容 / BP）
+        </label>
+      </div>
+    </div>
+
+    <div class="card section">
+      <div class="sec-title">攻略可信度</div>
+      <div class="form">
+        <label>超过几年视为不可信攻略
+          <input v-model.number="form.guidetrustYears" type="number" min="1" max="10" />
+        </label>
+        <div class="muted" style="font-size: 12px">默认 5 年，超过该年限的攻略将被标记为「不可信」，不采用。</div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <div class="sec-title">抓取来源</div>
+      <div v-for="s in form.sources" :key="s.key" class="src-row">
+        <label class="check">
+          <input v-model="s.enabled" type="checkbox" style="width: auto" />
+          {{ s.name }}
+        </label>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 16px">
+      <button class="btn primary" @click="save">保存设置</button>
+      <span v-if="saved" class="ok-msg">✓ 已保存</span>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const form = ref({});
+const saved = ref(false);
+
+onMounted(async () => {
+  form.value = await window.seer.settings.get();
+});
+
+async function save() {
+  await window.seer.settings.set(form.value);
+  saved.value = true;
+  setTimeout(() => (saved.value = false), 1500);
+}
+</script>
+
+<style scoped>
+.section { padding: 18px; margin-bottom: 16px; }
+.sec-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--primary-2); }
+.form { display: flex; flex-direction: column; gap: 14px; }
+.form label { font-size: 12px; color: var(--text-dim); display: flex; flex-direction: column; gap: 6px; }
+.check { flex-direction: row !important; align-items: center; gap: 8px !important; color: var(--text) !important; }
+.src-row { margin-bottom: 6px; }
+.ok-msg { align-self: center; color: var(--accent); }
+</style>

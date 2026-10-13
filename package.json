@@ -1,0 +1,46 @@
+{
+  "name": "seer-peak-guide",
+  "version": "1.0.0",
+  "description": "《赛尔号 巅峰之战》攻略助手 - 精灵池 / PvE 攻略 / PvP 阵容",
+  "author": "seer-peak-guide",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"electron .\"",
+    "dev:renderer": "vite",
+    "build": "vite build",
+    "start": "electron .",
+    "dist": "vite build && electron-builder"
+  },
+  "dependencies": {
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "concurrently": "^9.0.1",
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8",
+    "vite": "^5.4.8",
+    "vue": "^3.5.10"
+  },
+  "build": {
+    "appId": "com.seer.peakguide",
+    "productName": "巅峰之战攻略助手",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  }
+}
