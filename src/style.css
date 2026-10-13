@@ -1,0 +1,238 @@
+:root {
+  --bg: #0b1220;
+  --bg-2: #0f1a2f;
+  --panel: #121d33;
+  --panel-2: #17253f;
+  --line: #1f3050;
+  --text: #dfe7f5;
+  --text-dim: #8fa3c6;
+  --primary: #2b7bff;
+  --primary-2: #00c2ff;
+  --accent: #19d3a6;
+  --warn: #ffb020;
+  --danger: #ff5a6e;
+  --radius: 10px;
+  --shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.18s;
+}
+.btn:hover {
+  border-color: var(--primary);
+  color: var(--primary-2);
+}
+.btn.primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  border: none;
+  color: #fff;
+  font-weight: 600;
+}
+.btn.primary:hover {
+  filter: brightness(1.1);
+}
+.btn.danger {
+  color: var(--danger);
+}
+.btn.danger:hover {
+  border-color: var(--danger);
+}
+.btn.sm {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  width: 100%;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+}
+
+.tag {
+  display: inline-block;
+  padding: 3px 9px;
+  margin: 2px 3px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--primary-2);
+}
+
+/* 布局骨架 */
+.layout {
+  display: flex;
+  height: 100%;
+}
+.sidebar {
+  width: 220px;
+  background: linear-gradient(180deg, var(--bg-2), var(--panel));
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+.logo .mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  color: #fff;
+}
+.logo h1 {
+  font-size: 15px;
+}
+.logo .sub {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 9px;
+  color: var(--text-dim);
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.nav-item:hover {
+  background: var(--panel-2);
+  color: var(--text);
+}
+.nav-item.active {
+  background: rgba(43, 123, 255, 0.12);
+  color: var(--primary-2);
+  border-color: rgba(0, 194, 255, 0.3);
+}
+.nav-item .ico {
+  width: 18px;
+  text-align: center;
+}
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.page-sub {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.muted {
+  color: var(--text-dim);
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
