@@ -107,10 +107,13 @@ function defaultSettings() {
     sources: [
       { key: 'official', name: '官方图鉴', enabled: true },
       { key: 'community', name: '社区论坛', enabled: true },
-      { key: 'laoxiaoyi', name: '雷小伊社区', enabled: true }
+      { key: 'laoxiaoyi', name: '雷小伊社区', enabled: true },
+      { key: 'tieba', name: '百度贴吧', enabled: true, fname: '赛尔号' }
     ],
     // 各来源自定义入口（host，逗号分隔）
-    sourceHosts: { laoxiaoyi: '' }
+    sourceHosts: { laoxiaoyi: '' },
+    // 贴吧作为攻略来源时的目标吧名
+    tiebaFname: '赛尔号'
   };
 }
 

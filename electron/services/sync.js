@@ -43,6 +43,8 @@ function registerIpc() {
     const adapter = scraper.resolveScript(url, settings);
     return { script: adapter.extractScript, adapterId: adapter.id, adapterName: adapter.name };
   });
+  // 获取「抓当前页正文作攻略素材」的抽取脚本（贴吧帖子正文等）
+  ipcMain.handle('sync:getTextScript', () => ({ script: scraper.extractTextScript }));
   ipcMain.handle('sync:import', (_e, items) => {
     const cleaned = scraper.parseExtracted(items, 'browser');
     const res = poolSvc.batchImport(cleaned);

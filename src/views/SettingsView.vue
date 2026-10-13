@@ -39,7 +39,15 @@
           <input v-model="s.enabled" type="checkbox" style="width: auto" />
           {{ s.name }}
         </label>
-        <div v-if="s.key==='laoxiaoyi'" class="host-row">
+        <div v-if="s.key==='tieba'" class="host-row">
+          <div class="muted" style="font-size:12px">贴吧吧名（作为攻略抓取来源，如：赛尔号）</div>
+          <input
+            v-model="tiebaFname"
+            placeholder="例如 赛尔号"
+            style="width:100%;margin-top:6px;background:#0b1220;border:1px solid #1f3050;color:#dfe7f5;padding:7px 10px;border-radius:8px;font-size:13px"
+          />
+        </div>
+        <div v-else-if="s.key==='laoxiaoyi'" class="host-row">
           <div class="muted" style="font-size:12px">雷小伊社区精灵图鉴入口（host，逗号分隔，可留空）</div>
           <input
             v-model="form.sourceHosts.laoxiaoyi"
@@ -62,13 +70,16 @@ import { ref, onMounted } from 'vue';
 
 const form = ref({});
 const saved = ref(false);
+const tiebaFname = ref('赛尔号');
 
 onMounted(async () => {
   form.value = await window.seer.settings.get();
+  tiebaFname.value = form.value.tiebaFname || '赛尔号';
   if (!form.value.sourceHosts) form.value.sourceHosts = { laoxiaoyi: '' };
 });
 
 async function save() {
+  form.value.tiebaFname = tiebaFname.value;
   await window.seer.settings.set(form.value);
   saved.value = true;
   setTimeout(() => (saved.value = false), 1500);

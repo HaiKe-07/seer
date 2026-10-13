@@ -35,12 +35,15 @@
     <div class="address"><input id="url" placeholder="输入赛尔号页面地址，回车跳转（可登录后浏览）" /></div>
     <button id="go">前往</button>
     <button id="grab" class="primary">抓取当前页精灵</button>
+    <button id="grabText">抓正文素材</button>
     <button id="done">完成并导入</button>
   </div>
 
-  <div id="status" class="status">提示：内置浏览器仅供你浏览/登录页面。点「抓取当前页精灵」采集当前页精灵候选，「完成并导入」写入精灵池。</div>
+  <div id="status" class="status">提示：内置浏览器仅供你浏览/登录页面。点「抓取当前页精灵」采集当前页精灵候选，「抓正文素材」抽取正文用于攻略，「完成并导入」写入精灵池。</div>
 
   <webview id="wv" allowpopups></webview>
+
+  <textarea id="textOut" hidden style="width:100%;flex:1;background:#0b1220;color:#dfe7f5;border:1px solid #1f3050;padding:10px;font-size:12px;resize:none" placeholder="已抓取的正文素材会显示在这里，可全选复制，再到【PvE 攻略】页手动导入原始文本供 AI 清洗。"></textarea>
 
   <div class="resultbar">
     <span>已抓取候选：<span id="count" class="count">0</span> 项</span>
@@ -53,6 +56,7 @@
     const statusEl = document.getElementById('status');
     const countEl = document.getElementById('count');
     const chipsEl = document.getElementById('chips');
+    const textOut = document.getElementById('textOut');
     let grabbed = [];
     let currentAdapter = '';
 
@@ -116,6 +120,30 @@
         setStatus(`已抓取 ${items.length} 项精灵候选${tag}，点「完成并导入」写入精灵池。`, 'ok');
       } catch (err) {
         setStatus('抓取失败：' + (err && err.message || err), 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // 抓取当前页正文（攻略素材）：展示在 textarea，供复制到 PvE 手动导入
+    document.getElementById('grabText').onclick = async () => {
+      setStatus('正在抽取当前页正文…');
+      const btn = document.getElementById('grabText');
+      btn.disabled = true;
+      try {
+        const got = await window.syncAPI.getTextScript();
+        const res = await wv.executeJavaScript(got.script, true);
+        const data = typeof res === 'string' ? JSON.parse(res) : res;
+        if (!data || !data.text || !data.text.trim()) {
+          setStatus('当前页未抽取到有效正文，请打开具体帖子/文章页后再试。', 'warn');
+          return;
+        }
+        textOut.hidden = false;
+        textOut.value = `【${data.title}】\n${data.url}\n\n${data.text}`;
+        textOut.select();
+        setStatus(`已抽取正文 ${data.text.length} 字。可 Ctrl+C 复制，再到【PvE 攻略】粘贴导入。`, 'ok');
+      } catch (err) {
+        setStatus('抽取失败：' + (err && err.message || err), 'error');
       } finally {
         btn.disabled = false;
       }

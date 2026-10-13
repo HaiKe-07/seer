@@ -46,7 +46,10 @@ async function fetchAndTidy(target, keywords, rawText) {
   for (const src of settings.sources || []) {
     if (src.enabled) {
       try {
-        const res = await scraper.scrapeSource(src, keywords || [target]);
+        // 贴吧源：使用设置里配置的吧名；其余源原样
+        const srcCfg =
+          src.key === 'tieba' && settings.tiebaFname ? { ...src, fname: settings.tiebaFname } : src;
+        const res = await scraper.scrapeSource(srcCfg, keywords || [target]);
         if (res.length) texts.push(...res);
       } catch (e) {
         console.error('抓取来源失败', src.key, e.message);
