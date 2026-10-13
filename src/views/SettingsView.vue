@@ -34,11 +34,19 @@
 
     <div class="card section">
       <div class="sec-title">抓取来源</div>
-      <div v-for="s in form.sources" :key="s.key" class="src-row">
+      <div v-for="s in form.sources" :key="s.key" class="src-row" @click.prevent.stop>
         <label class="check">
           <input v-model="s.enabled" type="checkbox" style="width: auto" />
           {{ s.name }}
         </label>
+        <div v-if="s.key==='laoxiaoyi'" class="host-row">
+          <div class="muted" style="font-size:12px">雷小伊社区精灵图鉴入口（host，逗号分隔，可留空）</div>
+          <input
+            v-model="form.sourceHosts.laoxiaoyi"
+            placeholder="例如 bbs.tiepi.top, seer.tiepi.top"
+            style="width:100%;margin-top:6px;background:#0b1220;border:1px solid #1f3050;color:#dfe7f5;padding:7px 10px;border-radius:8px;font-size:13px"
+          />
+        </div>
       </div>
     </div>
 
@@ -57,6 +65,7 @@ const saved = ref(false);
 
 onMounted(async () => {
   form.value = await window.seer.settings.get();
+  if (!form.value.sourceHosts) form.value.sourceHosts = { laoxiaoyi: '' };
 });
 
 async function save() {

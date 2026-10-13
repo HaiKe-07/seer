@@ -3,6 +3,7 @@
 // 说明：真实站点结构易变，这里提供 Fetch + 基础解析框架，并允许用户
 // 通过“手动导入原始文本”让 AI 清洗。未来可针对雷小伊社区等做专属适配器。
 const axios = require('axios');
+const adapters = require('./adapters');
 
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36';
@@ -123,4 +124,19 @@ function parseExtracted(raw, origin = '') {
   return out;
 }
 
-module.exports = { fetchURL, stripHtml, scrapeSource, UA, extractPokemonScript, parseExtracted };
+// 按页面 URL 解析最贴合抓取适配器，返回 { id, name, extractScript }。
+// 未命中专属适配器时回退到通用启发式（extractPokemonScript）。
+function resolveScript(url, settings) {
+  return adapters.resolve(url, settings);
+}
+
+module.exports = {
+  fetchURL,
+  stripHtml,
+  scrapeSource,
+  UA,
+  extractPokemonScript,
+  parseExtracted,
+  resolveScript,
+  adapters
+};

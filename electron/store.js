@@ -108,7 +108,9 @@ function defaultSettings() {
       { key: 'official', name: '官方图鉴', enabled: true },
       { key: 'community', name: '社区论坛', enabled: true },
       { key: 'laoxiaoyi', name: '雷小伊社区', enabled: true }
-    ]
+    ],
+    // 各来源自定义入口（host，逗号分隔）
+    sourceHosts: { laoxiaoyi: '' }
   };
 }
 

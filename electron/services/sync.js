@@ -37,7 +37,12 @@ function openSyncWindow() {
 
 // 注册抓取窗口相关 IPC
 function registerIpc() {
-  ipcMain.handle('sync:getScript', () => scraper.extractPokemonScript);
+  // 根据当前页面 URL 返回最贴合的抓取脚本 + 适配器信息
+  ipcMain.handle('sync:getScript', (_e, url) => {
+    const settings = require('../store').db.settings;
+    const adapter = scraper.resolveScript(url, settings);
+    return { script: adapter.extractScript, adapterId: adapter.id, adapterName: adapter.name };
+  });
   ipcMain.handle('sync:import', (_e, items) => {
     const cleaned = scraper.parseExtracted(items, 'browser');
     const res = poolSvc.batchImport(cleaned);

@@ -54,6 +54,7 @@
     const countEl = document.getElementById('count');
     const chipsEl = document.getElementById('chips');
     let grabbed = [];
+    let currentAdapter = '';
 
     function setStatus(msg, kind = '') {
       statusEl.textContent = msg;
@@ -99,14 +100,20 @@
       const btn = document.getElementById('grab');
       btn.disabled = true;
       try {
-        const result = await wv.executeJavaScript(window.SEER_EXTRACT_SCRIPT || '0', true);
+        const pageUrl = wv.getURL && wv.getURL();
+        // 按当前页面 URL 获取最贴合的提取脚本（适配器）+ 命中信息
+        const got = await window.syncAPI.getScript(pageUrl || '');
+        const script = (got && got.script) || (window.SEER_EXTRACT_SCRIPT || '0');
+        currentAdapter = got && got.adapterName;
+        const result = await wv.executeJavaScript(script, true);
         let data = result;
         if (typeof result === 'string') { try { data = JSON.parse(result); } catch (_) { data = null; } }
         const items = (data && data.items) ? data.items : (Array.isArray(data) ? data : []);
         if (!items.length) { setStatus('当前页未识别到精灵候选，请滚动/翻页后再试（需含「·」命名或精灵卡片图）。', 'warn'); return; }
         grabbed = items;
         renderChips();
-        setStatus(`已抓取 ${items.length} 项精灵候选，点「完成并导入」写入精灵池。`, 'ok');
+        const tag = currentAdapter ? ` [${currentAdapter}]` : '';
+        setStatus(`已抓取 ${items.length} 项精灵候选${tag}，点「完成并导入」写入精灵池。`, 'ok');
       } catch (err) {
         setStatus('抓取失败：' + (err && err.message || err), 'error');
       } finally {
