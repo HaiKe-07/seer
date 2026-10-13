@@ -1,0 +1,48 @@
+// 精灵抓取同步：内置浏览器窗口管理 + 导入
+const { BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const poolSvc = require('./pool');
+const scraper = require('./scraper');
+
+let syncWin = null;
+
+// 配置 webview 支持的主窗口参数（需要 webpreferences: webviewTag）
+function createWindowOpts() {
+  return {
+    width: 1100,
+    height: 780,
+    title: '精灵抓取 · 内置浏览器',
+    backgroundColor: '#0b1220',
+    webPreferences: {
+      preload: path.join(__dirname, '../sync-preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      webviewTag: true,
+      sandbox: false
+    }
+  };
+}
+
+// 打开抓取同步窗口（若已存在则聚焦）
+function openSyncWindow() {
+  if (syncWin && !syncWin.isDestroyed()) {
+    syncWin.focus();
+    return syncWin;
+  }
+  syncWin = new BrowserWindow(createWindowOpts());
+  syncWin.loadFile(path.join(__dirname, '../sync-window.html'));
+  syncWin.on('closed', () => { syncWin = null; });
+  return syncWin;
+}
+
+// 注册抓取窗口相关 IPC
+function registerIpc() {
+  ipcMain.handle('sync:getScript', () => scraper.extractPokemonScript);
+  ipcMain.handle('sync:import', (_e, items) => {
+    const cleaned = scraper.parseExtracted(items, 'browser');
+    const res = poolSvc.batchImport(cleaned);
+    return { added: cleaned, count: cleaned.length };
+  });
+}
+
+module.exports = { openSyncWindow, registerIpc, createWindowOpts };

@@ -13,6 +13,7 @@
           @input="refresh"
         />
         <span style="flex: 1"></span>
+        <button class="btn" @click="window.seer.pool.openSync()">🌐 浏览器抓取</button>
         <button class="btn" @click="openImport">批量导入</button>
         <button class="btn primary" @click="openAdd">＋ 新增精灵</button>
       </div>

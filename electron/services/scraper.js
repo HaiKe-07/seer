@@ -43,4 +43,84 @@ async function scrapeSource(source, keywords) {
   return [{ url: res.url, text: stripHtml(res.text) }];
 }
 
-module.exports = { fetchURL, stripHtml, scrapeSource, UA };
+// 内置浏览器抓取脚本：在页面上执行，返回候选精灵列表。
+// 写法上做成字符串，注入到 webview 的页面上下文中执行后再返回 JSON。
+const extractPokemonScript = `(() => {
+  const found = new Map(); // name -> {name, source}
+  const add = (name, source) => {
+    name = (name || '').replace(/\\s+/g, ' ').trim();
+    if (!name) return;
+    // 过滤明显非精灵名的碎片
+    if (name.length < 1 || name.length > 16) return;
+    if (/^(搜索|首页|登录|注册|返回|下一页|上一页|确定|取消|退出|更多|menu|index)$/i.test(name)) return;
+    const key = name;
+    if (!found.has(key)) found.set(key, { name, source });
+  };
+  // 1) 图片 alt/title（精灵卡片通常以图片承载名称）
+  document.querySelectorAll('img').forEach((img) => {
+    const a = (img.getAttribute('alt') || '').trim();
+    const t = (img.getAttribute('title') || '').trim();
+    if (a) add(a, 'img:alt');
+    if (t && t !== a) add(t, 'img:title');
+  });
+  // 2) 含间隔号 〔·〕的文本（赛尔号精灵名常见命名，如 "圣雷·布鲁"）
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    const txt = (node.textContent || '').replace(/\\s+/g, ' ').trim();
+    if (txt && txt.includes('·')) {
+      // 1) 按分句符号拆分，整段含·且长度合适直接采用
+      txt.split(/[，,；;。.]+/).forEach((seg) => {
+        seg = seg.trim().replace(/^[\\[（(【]+|[\\]）)】]+$/g, '');
+        if (seg.includes('·') && seg.length >= 2 && seg.length <= 16) add(seg, 'text');
+      });
+      // 2) 按空白词元拆分，提取句中每个独立的含·片段（如 "遇 白泽·光 可用 玄武·霸"）
+      txt.split(/[\\s，,；;。.()（）|：:]+/).forEach((tok) => {
+        tok = tok.trim();
+        if (tok.includes('·') && tok.length >= 2 && tok.length <= 16) add(tok, 'text');
+      });
+    }
+  }
+  // 3) 常见的卡片类名容器文本
+  document.querySelectorAll('[class*="mon"], [class*="card"], [class*="elite"], [id*="pokemon"], [class*="pet"]').forEach((el) => {
+    const t = (el.textContent || '').replace(/\\s+/g, ' ').trim();
+    if (t && t.includes('·') && t.length <= 16) add(t, 'card');
+  });
+  const list = Array.from(found.values());
+  return JSON.stringify({ count: list.length, items: list });
+})();`;
+
+// 把抓取结果清洗为标准精灵字段；要求至少 name
+function parseExtracted(raw, origin = '') {
+  const out = [];
+  const seen = new Set();
+  const normalize = (arr) => {
+    (Array.isArray(arr) ? arr : []).forEach((it) => {
+      const name = (it && (it.name || it.NOMBRE || it.title)) || '';
+      if (!name || name.length < 1) return;
+      const key = String(name).trim();
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({
+        name: key,
+        attributes: [],
+        note: (it.source || origin) === 'text' ? '来自页面文本抓取' : (it.source || origin),
+        source: it.source || origin
+      });
+    });
+    return out;
+  };
+  try {
+    if (typeof raw === 'string' && raw.trim().startsWith('{')) {
+      const parsed = JSON.parse(raw);
+      normalize(parsed.items || parsed);
+      return out;
+    }
+    normalize(raw);
+  } catch (e) {
+    /* 解析失败返回空 */
+  }
+  return out;
+}
+
+module.exports = { fetchURL, stripHtml, scrapeSource, UA, extractPokemonScript, parseExtracted };

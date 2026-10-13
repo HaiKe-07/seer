@@ -6,6 +6,7 @@ const ai = require('./services/ai');
 const poolSvc = require('./services/pool');
 const pveSvc = require('./services/pve');
 const pvpSvc = require('./services/pvp');
+const syncSvc = require('./services/sync');
 
 function registerIpc() {
   // 设置
@@ -20,6 +21,7 @@ function registerIpc() {
   ipcMain.handle('pool:save', (_e, mon) => poolSvc.upsert(mon));
   ipcMain.handle('pool:remove', (_e, id) => poolSvc.remove(id));
   ipcMain.handle('pool:import', (_e, items) => poolSvc.batchImport(items));
+  ipcMain.handle('pool:openSync', () => syncSvc.openSyncWindow());
 
   // PvE
   ipcMain.handle('pve:list', () => pveSvc.trustworthy());
@@ -38,6 +40,9 @@ function registerIpc() {
   ipcMain.handle('pvp:setRestricted', (_e, list) => pvpSvc.setRestricted(list));
   ipcMain.handle('pvp:getMeta', () => pvpSvc.getMeta());
   ipcMain.handle('pvp:setMeta', (_e, list) => pvpSvc.setMeta(list));
+
+  // 精灵抓取同步窗口
+  syncSvc.registerIpc();
 }
 
 function createWindow() {

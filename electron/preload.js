@@ -11,7 +11,8 @@ contextBridge.exposeInMainWorld('seer', {
     list: () => ipcRenderer.invoke('pool:list'),
     save: (mon) => ipcRenderer.invoke('pool:save', mon),
     remove: (id) => ipcRenderer.invoke('pool:remove', id),
-    import: (items) => ipcRenderer.invoke('pool:import', items)
+    import: (items) => ipcRenderer.invoke('pool:import', items),
+    openSync: () => ipcRenderer.invoke('pool:openSync')
   },
   pve: {
     list: () => ipcRenderer.invoke('pve:list'),
