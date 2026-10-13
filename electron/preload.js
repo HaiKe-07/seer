@@ -23,6 +23,10 @@ contextBridge.exposeInMainWorld('seer', {
   pvp: {
     recalc: (banned) => ipcRenderer.invoke('pvp:recalc', banned),
     analyze: (team, opts) => ipcRenderer.invoke('pvp:analyze', team, opts),
-    models: () => ipcRenderer.invoke('pvp:models')
+    models: () => ipcRenderer.invoke('pvp:models'),
+    getRestricted: () => ipcRenderer.invoke('pvp:getRestricted'),
+    setRestricted: (list) => ipcRenderer.invoke('pvp:setRestricted', list),
+    getMeta: () => ipcRenderer.invoke('pvp:getMeta'),
+    setMeta: (list) => ipcRenderer.invoke('pvp:setMeta', list)
   }
 });

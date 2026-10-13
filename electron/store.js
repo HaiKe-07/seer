@@ -22,7 +22,9 @@ const db = {
   pool: [], // 精灵池
   pve: [], // PvE 攻略
   pvpModels: [], // PvP 套路模板
-  enemies: [] // 敌人/关卡数据 (由图鉴等来源)
+  enemies: [], // 敌人/关卡数据 (由图鉴等来源)
+  restrictedPool: [], // PvP 限制池/禁限表：当前版本被禁用或受限的精灵
+  pvpMeta: [] // PvP 热门对战环境描述
 };
 
 function ensureDataRoot() {
@@ -71,10 +73,13 @@ function loadAll() {
   db.pve = readJSON('pve', []);
   db.pvpModels = readJSON('pvpModels', defaultPvpModels());
   db.enemies = readJSON('enemies', []);
+  db.restrictedPool = readJSON('restrictedPool', []);
+  db.pvpMeta = readJSON('pvpMeta', []);
 }
 
 // 写入一个集合（按 key 更新 db 并落盘）
 function saveCollection(key) {
+  if (!(key in db)) return null;
   writeJSON(key, db[key]);
   return db[key];
 }
@@ -85,7 +90,9 @@ function getAll() {
     pool: db.pool,
     pve: db.pve,
     pvpModels: db.pvpModels,
-    enemies: db.enemies
+    enemies: db.enemies,
+    restrictedPool: db.restrictedPool,
+    pvpMeta: db.pvpMeta
   };
 }
 

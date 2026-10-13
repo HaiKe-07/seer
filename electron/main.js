@@ -34,6 +34,10 @@ function registerIpc() {
   ipcMain.handle('pvp:recalc', (_e, banned) => pvpSvc.recalc(banned));
   ipcMain.handle('pvp:analyze', (_e, team, opts) => pvpSvc.analyzeForTeam(team, opts));
   ipcMain.handle('pvp:models', () => store.db.pvpModels);
+  ipcMain.handle('pvp:getRestricted', () => pvpSvc.getRestricted());
+  ipcMain.handle('pvp:setRestricted', (_e, list) => pvpSvc.setRestricted(list));
+  ipcMain.handle('pvp:getMeta', () => pvpSvc.getMeta());
+  ipcMain.handle('pvp:setMeta', (_e, list) => pvpSvc.setMeta(list));
 }
 
 function createWindow() {
@@ -74,7 +78,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
-  ['pool', 'pve', 'pvpModels', 'settings', 'enemies'].forEach((k) => {
+  ['pool', 'pve', 'pvpModels', 'settings', 'enemies', 'restrictedPool', 'pvpMeta'].forEach((k) => {
     try {
       store.saveCollection(k);
     } catch (e) {}
